@@ -1,0 +1,12 @@
+syntax = "proto3";
+package kfangw.loot.loot;
+
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/kfangw/loot/x/loot/types";
+
+// Params defines the parameters for the module.
+message Params {
+  option (gogoproto.goproto_stringer) = false;
+  
+}
