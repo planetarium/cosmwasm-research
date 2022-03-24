@@ -1,33 +1,49 @@
 <template>
   <!-- Not Connected -->
     <!-- Status Display / User Feedback -->
+  <div class="container">
     <div class="title">
       <p>Counter: {{counter}}</p>
     </div>
 
-    <!-- Controls -->
-    <div class="button-controls">
-      <SpButton type="secondary" @click="getCount()">Get Counter</SpButton>
+  <div class="sp-form-group">
+    <div class="sp-text sp-bold">Counter Contract Address</div>
+    <div>
+      <input
+          class="sp-input"
+          v-model="contract"
+          placeholder="cosmos1436kxs0w2es6xlqpp9rd35e3d0cjnw4sv8j3a7483sgks29jqwgsks67u5"
+      />
+    </div>
+  </div>
+
+
+  <!-- Controls -->
+    <div class="sp-form-group" v-if="this.contract.length > 0">
+      <SpButton @click="getCount()">Get Counter</SpButton>
+      <div class="sp-line"></div>
       <SpButton type="secondary" @click="incrementCounter()">Increment Counter</SpButton>
       <SpButton type="secondary" @click="resetCounter()">Reset Counter</SpButton>
     </div>
-    <div>
-      <SpAcc></SpAcc>
-    </div>
 
     <!-- Loading -->
-    <div class="loading" v-if="loading.status">
+    <div v-if="loading.status">
       <p v-if="loading.msg">{{loading.msg}}</p>
     </div>
 
-    <div class="logs" v-if="logs.length">
+    <div v-if="logs.length">
       <div v-for="(log,i) in logs" :key="i">
-        <p class="label" v-if="log.timestamp">
-          <strong><span v-if="log.executedTxs">Counter Incremented&nbsp</span><span v-if="log.reset">Counter Reset&nbsp</span>({{log.timestamp}}):</strong>
+        <p v-if="log.timestamp">
+          <strong>
+            <span v-if="log.executedTxs">Counter Incremented&nbsp</span>
+            <span v-if="log.reset">Counter Reset&nbsp</span>
+            ({{log.timestamp}}):
+          </strong>
         </p>
-        <pre class="log-entry">{{ log }}</pre>
+        <pre>{{ log }}</pre>
       </div>
     </div>
+  </div>
 </template>
 
 <script>
@@ -36,8 +52,6 @@ import { calculateFee } from "@cosmjs/stargate"
 import { SpAcc } from '@starport/vue'
 import { computed, reactive } from 'vue'
 import { useStore } from 'vuex'
-
-const ContractAddress = process.env.VUE_APP_CONTRACT_ADDRESS
 
 export default {
   name: "Counter",
@@ -59,7 +73,7 @@ export default {
   },
   data: () => ({
     counter: 0,
-    contract: process.env.VUE_APP_CONTRACT_ADDRESS,
+    contract: "",
     loading: {status: false, msg:""},
     logs: [],
   }),
@@ -157,12 +171,17 @@ export default {
   margin-bottom: 32px;
 }
 
-.row {
-  display: flex;
-  flex-wrap: wrap;
-}
-.col {
-  flex-grow: 1;
-  padding: 20px;
+pre {
+  line-height:1.2em;
+  background:linear-gradient(180deg,#ccc 0,#ccc 1.2em,#eee 0);
+  background-size:2.4em 2.4em;
+  background-origin:content-box;
+  padding: 1em;
+  text-align:justify;
+  display: inline-block;
+  color: #0a4862;
+  background-color: #73c8eb;
+  border-color: #3bb3e3;
+  border-radius: 0.5em;
 }
 </style>
