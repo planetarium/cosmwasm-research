@@ -1,0 +1,73 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: fullnode02
+  labels:
+    app: fullnode02
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 1317
+    name: rest
+  - port: 26656
+    name: p2p
+  - port: 26657
+    name: rpc
+  - port: 26660
+    name: prometheus
+  selector:
+    app: fullnode02
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: fullnode02
+spec:
+  serviceName: "fullnode02"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fullnode02
+  template:
+    metadata:
+      labels:
+        app: fullnode02
+    spec:
+      containers:
+      - name: fullnode02
+        image: planetariumhq/cosmwasm:latest
+        command: [ "sh", "-c", "--" ]
+        args: [ "./setup_and_run.sh" ]
+        ports:
+        - containerPort: 1317
+          name: rest
+        - containerPort: 26656
+          name: p2p
+        - containerPort: 26657
+          name: rpc
+        - containerPort: 26660
+          name: prometheus
+        volumeMounts:
+        - name: fullnodedata
+          mountPath: /root/.loot
+        env:
+          - name: STAKE_TOKEN
+            value: "ustake"
+          - name: CHAIN_ID
+            value: "testnet"
+          - name: MONIKER
+            value: "fullnode02"
+          - name: UNSAFE_CORS
+            value: "1"
+          - name: PROMETHEUS
+            value: "1"
+          - name: ADAM_ADDRESS
+            value: "adam.cosmwasm-resear.ch"
+  volumeClaimTemplates:
+  - metadata:
+      name: fullnodedata
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 30Gi

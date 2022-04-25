@@ -1,0 +1,75 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: adam
+  labels:
+    app: adam
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 1317
+    name: rest
+  - port: 26656
+    name: p2p
+  - port: 26657
+    name: rpc
+  - port: 26660
+    name: prometheus
+  selector:
+    app: adam
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: adam
+spec:
+  serviceName: "adam"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: adam
+  template:
+    metadata:
+      labels:
+        app: adam
+    spec:
+      containers:
+      - name: adam
+        image: planetariumhq/cosmwasm:latest
+        command: [ "sh", "-c", "--" ]
+        args: [ "./setup_and_run.sh" ]
+        ports:
+        - containerPort: 1317
+          name: rest
+        - containerPort: 26656
+          name: p2p
+        - containerPort: 26657
+          name: rpc
+        - containerPort: 26660
+          name: prometheus
+        volumeMounts:
+        - name: fullnodedata
+          mountPath: /root/.loot
+        env:
+          - name: STAKE_TOKEN
+            value: "ustake"
+          - name: CHAIN_ID
+            value: "testnet"
+          - name: MONIKER
+            value: "adam"
+          - name: ADAM
+            value: "1"
+          - name: UNSAFE_CORS
+            value: "1"
+          - name: PROMETHEUS
+            value: "1"
+          - name: MNEMONIC
+            value: "video time blush urge gate veteran wood gate witness cube gown humor funny olympic spider muffin label bounce inquiry payment inmate collect save uniform"
+  volumeClaimTemplates:
+  - metadata:
+      name: fullnodedata
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 30Gi

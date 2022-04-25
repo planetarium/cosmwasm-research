@@ -1,0 +1,46 @@
+serviceAccounts:
+  alertmanager:
+    create: false
+    name:
+    annotations: {}
+  nodeExporter:
+    create: false
+    name:
+    annotations: {}
+  pushgateway:
+    create: false
+    name:
+    annotations: {}
+  server:
+    create: true
+    name:
+    annotations: {}
+
+alertmanager:
+  enabled: false
+
+nodeExporter:
+  enabled: false
+
+pushgateway:
+  enabled: false
+
+server:
+  enabled: true
+
+serverFiles:
+  prometheus.yml:
+    scrape_configs:
+      - job_name: validator-metrics-aggregator
+        metrics_path: /metrics
+        static_configs:
+          - targets:
+            - adam.cosmwasm-resear.ch:26660
+            - abel.cosmwasm-resear.ch:26660
+            - cain.cosmwasm-resear.ch:26660
+            - seth.cosmwasm-resear.ch:26660
+            - fullnode01.cosmwasm-resear.ch:26660
+            - fullnode02.cosmwasm-resear.ch:26660
+            - fullnode03.cosmwasm-resear.ch:26660
+        tls_config:
+          insecure_skip_verify: true
