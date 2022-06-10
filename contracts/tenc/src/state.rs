@@ -9,6 +9,7 @@ use cw_storage_plus::{Item, Map};
 pub struct Config {
     pub owner: Addr,
     pub equipments_address: Option<Addr>,
+    pub random_address: Option<Addr>,
     pub name: String,
     pub symbol: String,
     pub token_uri: String,

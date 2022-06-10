@@ -7,6 +7,7 @@ use serde::{Deserialize, Serialize};
 pub struct InstantiateMsg {
     pub owner: Addr,
     pub equipments_code_id: u64,
+    pub random_address: Option<Addr>,
     pub name: String,
     pub symbol: String,
     pub token_uri: String,
@@ -43,6 +44,7 @@ pub enum QueryMsg {
 pub struct ConfigResponse {
     pub owner: Addr,
     pub equipments_address: Option<Addr>,
+    pub random_address: Option<Addr>,
     pub name: String,
     pub symbol: String,
     pub token_uri: String,

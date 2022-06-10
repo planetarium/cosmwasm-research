@@ -1,0 +1,25 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: drand
+spec:
+  schedule: "*/1 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: drand
+              image: planetariumhq/cosmwasm:latest
+              command: [ "sh", "-c", "--" ]
+              args: [ "./drand.sh" ]
+              env:
+                - name: CHAIN_ID
+                  value: "testnet"
+                - name: CONTRACT_ADDR
+                  value: "cosmos14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr3txmfvw9s4hmalr"
+                - name: REMOTE_FULLNODE
+                  value: "adam.cosmwasm-resear.ch"
+                - name: MNEMONIC
+                  value: "own demand blast uncover assault know limit route expose sound spirit duck twin reject appear wasp future bid degree emotion start warfare auto scatter"
+          restartPolicy: Never

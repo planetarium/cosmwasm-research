@@ -1,6 +1,6 @@
 use crate::error::ContractError;
 use crate::msg::{ConfigResponse, ExecuteMsg, InstantiateMsg, QueryMsg};
-use crate::rng::get_random;
+use crate::rng::{get_random};
 use crate::state::{Avatar, Config, Stage, AVATARS, CONFIG, STAGES};
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
@@ -42,6 +42,7 @@ pub fn instantiate(
     let config = Config {
         owner: info.sender,
         equipments_address: None,
+        random_address: msg.random_address,
         name: msg.name.clone(),
         symbol: msg.symbol.clone(),
         token_uri: msg.token_uri,
@@ -105,6 +106,7 @@ fn query_config(deps: Deps) -> StdResult<ConfigResponse> {
     Ok(ConfigResponse {
         owner: config.owner,
         equipments_address: config.equipments_address,
+        random_address: config.random_address,
         name: config.name,
         symbol: config.symbol,
         token_uri: config.token_uri,
@@ -276,9 +278,8 @@ fn battle_power(avatar: Avatar, equipment: Option<String>) -> Result<u32, Contra
     Ok(avatar.level * LEVEL_FACTOR + equipment_level * ITEM_FACTOR)
 }
 
-fn random(_deps: &DepsMut, from: u32, to: u32) -> u32 {
-    const RANDOM_SEED: &str = "Fix Me. Use https://github.com/confio/rand";
-    get_random(RANDOM_SEED, from, to)
+fn random(deps: &DepsMut, from: u32, to: u32) -> u32 {
+    get_random(deps, from, to).unwrap()
 }
 
 pub fn mint_equipment_item(
@@ -319,10 +320,8 @@ pub fn mint_equipment_item(
 mod tests {
     use super::*;
     use cosmwasm_std::testing::{mock_dependencies, mock_env, mock_info, MOCK_CONTRACT_ADDR};
-    use cosmwasm_std::{from_binary, to_binary, Querier, SubMsgExecutionResponse, SubMsgResult};
+    use cosmwasm_std::{from_binary, to_binary, SubMsgExecutionResponse, SubMsgResult};
     use prost::Message;
-    use std::borrow::Borrow;
-
     // Type for replies to contract instantiate messes
     #[derive(Clone, PartialEq, Message)]
     struct MsgInstantiateContractResponse {
@@ -340,6 +339,7 @@ mod tests {
             name: String::from("SYNTH"),
             symbol: String::from("SYNTH"),
             equipments_code_id: 10u64,
+            random_address: Some(Addr::unchecked("randomcontract")),
             token_uri: String::from("https://ipfs.io/ipfs/Q"),
             max_tokens: 1,
             extension: None,
@@ -397,6 +397,7 @@ mod tests {
             Config {
                 owner: Addr::unchecked("owner"),
                 equipments_address: Some(Addr::unchecked("nftcontract")),
+                random_address: Some(Addr::unchecked("randomcontract")),
                 name: msg.name,
                 symbol: msg.symbol,
                 token_uri: msg.token_uri,
@@ -415,6 +416,7 @@ mod tests {
             name: String::from("SYNTH"),
             symbol: String::from("SYNTH"),
             equipments_code_id: 10u64,
+            random_address: Some(Addr::unchecked("randomcontract")),
             token_uri: String::from("https://ipfs.io/ipfs/Q"),
             max_tokens: 1,
             extension: None,
@@ -514,6 +516,7 @@ mod tests {
             name: String::from("SYNTH"),
             symbol: String::from("SYNTH"),
             equipments_code_id: 10u64,
+            random_address: Some(Addr::unchecked("randomcontract")),
             token_uri: String::from("https://ipfs.io/ipfs/Q"),
             max_tokens: 1,
             extension: None,
@@ -553,6 +556,7 @@ mod tests {
             name: String::from("SYNTH"),
             symbol: String::from("SYNTH"),
             equipments_code_id: 10u64,
+            random_address: Some(Addr::unchecked("randomcontract")),
             token_uri: String::from("https://ipfs.io/ipfs/Q"),
             max_tokens: 1,
             extension: None,
