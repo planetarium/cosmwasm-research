@@ -1,5 +1,7 @@
 #!/bin/sh
 set -ex
+apk add xxd
+
 CONTRACT_ADDR=${CONTRACT_ADDR:-cosmos14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr3txmfvw9s4hmalr}
 REMOTE_FULLNODE=${REMOTE_FULLNODE:-adam.cosmwasm-resear.ch}
 CHAIN_ID=${CHAIN_ID:-testnet}
@@ -26,5 +28,5 @@ fi
 SIG=$(echo $LATEST | jq -r '.signature' | xxd -r -ps | base64 | tr -d '\r\n')
 PSIG=$(echo $LATEST | jq -r '.previous_signature' | xxd -r -ps | base64 | tr -d '\r\n')
 
-lootd tx wasm execute $CONTRACT_ADDR "{\"add\": {\"round\": $ROUND, \"signature\":\"${SIG}\", \"previous_signature\": \"${PSIG}\"}}" --from validator --node tcp://$REMOTE_FULLNODE:26657 --gas auto -y
+lootd tx wasm execute $CONTRACT_ADDR "{\"add\": {\"round\": $ROUND, \"signature\":\"${SIG}\", \"previous_signature\": \"${PSIG}\"}}" --from validator --node tcp://$REMOTE_FULLNODE:26657 --gas auto --keyring-backend test -y
 
